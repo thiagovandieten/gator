@@ -5,13 +5,13 @@ import (
 	"os"
 )
 
-func GetConfig(username string) (Config, error) {
+func GetConfig() (Config, error) {
 	homedir, err := GetConfigFilePath()
 	if err != nil {
 		return Config{}, err
 	}
 
-	data, err := os.ReadFile(homedir + configName)
+	data, err := os.ReadFile(homedir + configFileName)
 	if err != nil {
 		return Config{}, err
 	}

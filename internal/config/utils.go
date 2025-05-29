@@ -7,5 +7,6 @@ func GetConfigFilePath() (string, error) {
 	if err != nil {
 		return "", err
 	}
+	homedir = homedir + "/"
 	return homedir, err
 }
