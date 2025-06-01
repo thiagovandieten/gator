@@ -15,6 +15,10 @@ func SetUser(username string, cfg Config) error {
 }
 
 func write(cfg *Config) error {
+	if cfg.DBinURL == "" {
+		cfg.DBinURL = "postgres://example"
+	}
+
 	data, err := json.Marshal(cfg)
 	if err != nil {
 		return err

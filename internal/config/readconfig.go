@@ -22,5 +22,5 @@ func GetConfig() (Config, error) {
 		return Config{}, err
 	}
 
-	return Config{}, nil
+	return config, nil
 }
