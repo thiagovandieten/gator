@@ -25,7 +25,10 @@ func (c *commands) run(s *state, cmd command) error {
 }
 
 func (c *commands) register(name string, f func(*state, command)) error {
-
+	if c.Names == nil {
+		c.Names = make(map[string]func(*state, command))
+	}
+	c.Names[name] = f
 	return nil
 }
 
