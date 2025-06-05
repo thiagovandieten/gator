@@ -7,16 +7,16 @@ import (
 	"github.com/thiagovandieten/gator/internal/config"
 )
 
-type command struct {
+type Command struct {
 	Name string
 	Args []string
 }
 
-type commands struct {
-	Names map[string]func(*state, command)
+type Commands struct {
+	Names map[string]func(*state, Command)
 }
 
-func (c *commands) run(s *state, cmd command) error {
+func (c *Commands) run(s *state, cmd Command) error {
 	if c.Names[cmd.Name] != nil {
 		c.Names[cmd.Name](s, cmd)
 		return nil
@@ -24,15 +24,15 @@ func (c *commands) run(s *state, cmd command) error {
 	return errors.New("command not found")
 }
 
-func (c *commands) register(name string, f func(*state, command)) error {
+func (c *Commands) register(name string, f func(*state, Command)) error {
 	if c.Names == nil {
-		c.Names = make(map[string]func(*state, command))
+		c.Names = make(map[string]func(*state, Command))
 	}
 	c.Names[name] = f
 	return nil
 }
 
-func handlerLogin(s *state, cmd command) error {
+func handlerLogin(s *state, cmd Command) error {
 	if len(cmd.Args) == 0 {
 		return errors.New("no username was given")
 	}

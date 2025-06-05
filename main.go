@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 
 	"github.com/thiagovandieten/gator/internal/config"
@@ -13,15 +12,22 @@ func main() {
 		log.Fatalf(err.Error())
 	}
 
-	err = config.SetUser("Thiago", cfg)
-	if err != nil {
-		log.Fatalf(err.Error())
+	s := state{
+		cfg: &cfg,
 	}
 
-	cfg, err = config.GetConfig()
-
-	if err != nil {
-		log.Fatalf(err.Error())
+	cmds := Commands{
+		Names: make(map[string]func(*state, Command)),
 	}
-	fmt.Printf("Configuration: %+v\n", cfg)
+	// err = config.SetUser("Thiago", cfg)
+	// if err != nil {
+	// 	log.Fatalf(err.Error())
+	// }
+
+	// cfg, err = config.GetConfig()
+
+	// if err != nil {
+	// 	log.Fatalf(err.Error())
+	// }
+	// fmt.Printf("Configuration: %+v\n", cfg)
 }
