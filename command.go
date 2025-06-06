@@ -13,7 +13,7 @@ type Command struct {
 }
 
 type Commands struct {
-	Names map[string]func(*state, Command)
+	Names map[string]func(*state, Command) error
 }
 
 func (c *Commands) run(s *state, cmd Command) error {
@@ -24,9 +24,9 @@ func (c *Commands) run(s *state, cmd Command) error {
 	return errors.New("command not found")
 }
 
-func (c *Commands) register(name string, f func(*state, Command)) error {
+func (c *Commands) register(name string, f func(*state, Command) error) error {
 	if c.Names == nil {
-		c.Names = make(map[string]func(*state, Command))
+		c.Names = make(map[string]func(*state, Command) error)
 	}
 	c.Names[name] = f
 	return nil

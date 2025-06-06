@@ -17,8 +17,14 @@ func main() {
 	}
 
 	cmds := Commands{
-		Names: make(map[string]func(*state, Command)),
+		Names: make(map[string]func(*state, Command) error),
 	}
+
+	cmds.Names["login"] = handlerLogin
+
+	c := Command{}
+
+	cmds.run(&s, c)
 	// err = config.SetUser("Thiago", cfg)
 	// if err != nil {
 	// 	log.Fatalf(err.Error())
