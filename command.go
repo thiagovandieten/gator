@@ -26,7 +26,7 @@ func (c *Commands) run(s *state, cmd Command) error {
 
 func (c *Commands) register(name string, f func(*state, Command) error) error {
 	if c.Names == nil {
-		c.Names = make(map[string]func(*state, Command) error)
+		return errors.New("No handler functions defined")
 	}
 	c.Names[name] = f
 	return nil
