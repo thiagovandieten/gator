@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"os"
 
 	"github.com/thiagovandieten/gator/internal/config"
 )
@@ -17,12 +18,14 @@ func main() {
 	}
 
 	cmds := Commands{
-		Names: make(map[string]func(*state, Command) error),
+		CommandHandlers: make(map[string]func(*state, Command) error),
 	}
 
-	cmds.Names["login"] = handlerLogin
-
-	c := Command{}
+	cmds.register("login", handlerLogin)
+	c := Command{
+		Name: os.Args[0],
+		Args: os.Args[1:],
+	}
 
 	cmds.run(&s, c)
 	// err = config.SetUser("Thiago", cfg)

@@ -13,22 +13,22 @@ type Command struct {
 }
 
 type Commands struct {
-	Names map[string]func(*state, Command) error
+	CommandHandlers map[string]func(*state, Command) error
 }
 
 func (c *Commands) run(s *state, cmd Command) error {
-	if c.Names[cmd.Name] != nil {
-		c.Names[cmd.Name](s, cmd)
-		return nil
+	if c.CommandHandlers[cmd.Name] == nil {
+		return errors.New("command not found")
 	}
-	return errors.New("command not found")
+	c.CommandHandlers[cmd.Name](s, cmd)
+	return nil
 }
 
 func (c *Commands) register(name string, f func(*state, Command) error) error {
-	if c.Names == nil {
-		return errors.New("No handler functions defined")
+	if c.CommandHandlers == nil {
+		return errors.New("no handler functions defined")
 	}
-	c.Names[name] = f
+	c.CommandHandlers[name] = f
 	return nil
 }
 
