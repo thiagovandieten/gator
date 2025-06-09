@@ -20,7 +20,11 @@ func (c *Commands) run(s *state, cmd Command) error {
 	if c.CommandHandlers[cmd.Name] == nil {
 		return errors.New("command not found")
 	}
-	c.CommandHandlers[cmd.Name](s, cmd)
+
+	err := c.CommandHandlers[cmd.Name](s, cmd)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -33,7 +37,7 @@ func (c *Commands) register(name string, f func(*state, Command) error) error {
 }
 
 func handlerLogin(s *state, cmd Command) error {
-	if len(cmd.Args) == 0 {
+	if len(cmd.Args) == 0 || cmd.Args[0] == "" {
 		return errors.New("no username was given")
 	}
 
