@@ -1,11 +1,14 @@
 package main
 
 import (
+	"database/sql"
 	"errors"
 	"fmt"
 	"os"
 
+	_ "github.com/lib/pq"
 	"github.com/thiagovandieten/gator/internal/config"
+	"github.com/thiagovandieten/gator/internal/database"
 )
 
 func fatal(e error) {
@@ -19,8 +22,15 @@ func main() {
 		fatal(err)
 	}
 
+	db, err := sql.Open("postgres", cfg.DBinURL)
+	if err != nil {
+		fatal(err)
+	}
+	dbQueries := database.New(db)
+
 	s := state{
 		cfg: &cfg,
+		db:  dbQueries,
 	}
 
 	cmds := Commands{
