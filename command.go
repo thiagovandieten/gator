@@ -50,3 +50,7 @@ func handlerLogin(s *state, cmd Command) error {
 	fmt.Printf("User: %s has been set!\n", username)
 	return nil
 }
+
+func handlerRegister(s *state, cmd Command) error {
+	return nil
+}
