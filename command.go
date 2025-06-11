@@ -1,10 +1,14 @@
 package main
 
 import (
+	"context"
 	"errors"
 	"fmt"
+	"time"
 
+	"github.com/google/uuid"
 	"github.com/thiagovandieten/gator/internal/config"
+	"github.com/thiagovandieten/gator/internal/database"
 )
 
 type Command struct {
@@ -42,7 +46,7 @@ func handlerLogin(s *state, cmd Command) error {
 	}
 
 	username := cmd.Args[0]
-	err := config.SetUser(username, *s.cfg)
+	err := config.SetUser(username, s.cfg)
 	if err != nil {
 		return err
 	}

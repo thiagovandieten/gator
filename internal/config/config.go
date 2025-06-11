@@ -44,9 +44,9 @@ func getConfigFilePath() (string, error) {
 	return homedir, err
 }
 
-func SetUser(username string, cfg Config) error {
+func SetUser(username string, cfg *Config) error {
 	cfg.Username = username
-	err := write(&cfg)
+	err := write(cfg)
 	if err != nil {
 		return err
 	}
