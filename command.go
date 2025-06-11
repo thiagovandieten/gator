@@ -46,7 +46,13 @@ func handlerLogin(s *state, cmd Command) error {
 	}
 
 	username := cmd.Args[0]
-	err := config.SetUser(username, s.cfg)
+
+	_, err := s.db.GetUser(context.Background(), username)
+	if err != nil {
+		return err
+	}
+
+	err = config.SetUser(username, s.cfg)
 	if err != nil {
 		return err
 	}
