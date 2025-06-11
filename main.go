@@ -42,6 +42,11 @@ func main() {
 		fatal(err)
 	}
 
+	err = cmds.register("register", handlerRegister)
+	if err != nil {
+		fatal(err)
+	}
+
 	if len(os.Args) < 2 {
 		err := errors.New("no command given")
 		fatal(err)

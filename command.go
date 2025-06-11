@@ -56,5 +56,24 @@ func handlerLogin(s *state, cmd Command) error {
 }
 
 func handlerRegister(s *state, cmd Command) error {
+	if len(cmd.Args) <= 0 || cmd.Args[0] == "" {
+		return errors.New("no username was given")
+	}
+	params := database.CreateUserParams{
+		ID:        uuid.New(),
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+		Name:      cmd.Args[0],
+	}
+
+	result, err := s.db.CreateUser(context.Background(), params)
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("User %s has been created!\n", result.Name)
+	fmt.Printf("DEBUG: User info:\n%-v\n", result)
+	config.SetUser(result.Name, s.cfg)
+
 	return nil
 }
