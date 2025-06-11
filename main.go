@@ -61,15 +61,4 @@ func main() {
 	if err != nil {
 		fatal(err)
 	}
-	// err = config.SetUser("Thiago", cfg)
-	// if err != nil {
-	// 	log.Fatalf(err.Error())
-	// }
-
-	// cfg, err = config.GetConfig()
-
-	// if err != nil {
-	// 	log.Fatalf(err.Error())
-	// }
-	// fmt.Printf("Configuration: %+v\n", cfg)
 }
