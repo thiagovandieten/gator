@@ -109,5 +109,19 @@ func handlerReset(s *state, cmd Command) error {
 }
 
 func handlerGetAllUsers(s *state, cmd Command) error {
+	users, err := s.db.GetAllUsers(context.Background())
+	if err != nil {
+		return err
+	}
+
+	for _, user := range users {
+
+		userStr := fmt.Sprintf("* %s", user.Name)
+		if user.Name == s.cfg.Username {
+			userStr += " (current)"
+		}
+		fmt.Println(userStr)
+	}
+
 	return nil
 }
