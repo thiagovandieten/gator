@@ -34,9 +34,22 @@ func (c *Commands) run(s *state, cmd Command) error {
 
 func (c *Commands) register(name string, f func(*state, Command) error) error {
 	if c.CommandHandlers == nil {
-		return errors.New("no handler functions defined")
+		return errors.New("commandHandlers map uninitialized")
 	}
 	c.CommandHandlers[name] = f
+	return nil
+}
+
+// registerAll registers multiple command handlers at once
+func (c *Commands) registerAll(handlers map[string]func(*state, Command) error) error {
+	if c.CommandHandlers == nil {
+		return errors.New("commandHandlers map uninitialized")
+	}
+
+	for name, handler := range handlers {
+		c.CommandHandlers[name] = handler
+	}
+
 	return nil
 }
 

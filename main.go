@@ -37,12 +37,10 @@ func main() {
 		CommandHandlers: make(map[string]func(*state, Command) error),
 	}
 
-	err = cmds.register("login", handlerLogin)
-	if err != nil {
-		fatal(err)
-	}
-
-	err = cmds.register("register", handlerRegister)
+	err = cmds.registerAll(map[string]func(*state, Command) error{
+		"login":    handlerLogin,
+		"register": handlerRegister,
+	})
 	if err != nil {
 		fatal(err)
 	}
