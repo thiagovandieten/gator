@@ -40,6 +40,8 @@ func main() {
 	err = cmds.registerAll(map[string]func(*state, Command) error{
 		"login":    handlerLogin,
 		"register": handlerRegister,
+		"reset":    handlerReset,
+		"users":    handlerGetAllUsers,
 	})
 	if err != nil {
 		fatal(err)
