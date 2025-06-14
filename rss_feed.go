@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"encoding/xml"
+	"html"
 	"io"
 	"net/http"
 	"time"
@@ -24,7 +25,7 @@ type RSSItem struct {
 	PubDate     string `xml:"pubDate"`
 }
 
-func fetchFeed(ctx context.Context, feedURL string) (*RSSFeed, error) {
+func fetchFeed(feedURL string) (*RSSFeed, error) {
 
 	// I think I would like a HTTP client in the state
 	// but for now I will just create one here for it's currently the
@@ -56,5 +57,19 @@ func fetchFeed(ctx context.Context, feedURL string) (*RSSFeed, error) {
 
 	xml.Unmarshal(data, &feed)
 
+	unescapeFields(&feed)
+
 	return &feed, nil
+}
+
+func unescapeFields(feed *RSSFeed) {
+	feed.Channel.Description = html.UnescapeString(feed.Channel.Description)
+	feed.Channel.Title = html.UnescapeString(feed.Channel.Title)
+
+	for _, item := range feed.Channel.Item {
+		item.Title = html.UnescapeString(item.Title)
+		item.Description = html.UnescapeString(item.Description)
+
+	}
+
 }

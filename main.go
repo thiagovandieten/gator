@@ -42,6 +42,7 @@ func main() {
 		"register": handlerRegister,
 		"reset":    handlerReset,
 		"users":    handlerGetAllUsers,
+		"agg":      handlerAgg,
 	})
 	if err != nil {
 		fatal(err)
