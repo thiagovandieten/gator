@@ -66,10 +66,10 @@ func unescapeFields(feed *RSSFeed) {
 	feed.Channel.Description = html.UnescapeString(feed.Channel.Description)
 	feed.Channel.Title = html.UnescapeString(feed.Channel.Title)
 
-	for _, item := range feed.Channel.Item {
+	for i, item := range feed.Channel.Item {
 		item.Title = html.UnescapeString(item.Title)
 		item.Description = html.UnescapeString(item.Description)
-
+		feed.Channel.Item[i] = item
 	}
 
 }

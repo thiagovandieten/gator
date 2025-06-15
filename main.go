@@ -43,6 +43,7 @@ func main() {
 		"reset":    handlerReset,
 		"users":    handlerGetAllUsers,
 		"agg":      handlerAgg,
+		"addfeed":  handlerAddFeed,
 	})
 	if err != nil {
 		fatal(err)
