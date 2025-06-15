@@ -44,6 +44,7 @@ func main() {
 		"users":    handlerGetAllUsers,
 		"agg":      handlerAgg,
 		"addfeed":  handlerAddFeed,
+		"feeds":    handlerFeeds,
 	})
 	if err != nil {
 		fatal(err)

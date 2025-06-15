@@ -54,3 +54,19 @@ func handlerAddFeed(s *state, cmd Command) error {
 
 	return nil
 }
+
+func handlerFeeds(s *state, cmd Command) error {
+	feeds, err := s.db.GetFeeds(context.Background())
+	if err != nil {
+		return err
+	}
+	if len(feeds) < 1 {
+		fmt.Printf("No feeds saved")
+		return nil
+	}
+	fmt.Printf("Name\tURL\tUsername\n")
+	for _, feed := range feeds {
+		fmt.Printf("%s\t%s\t%s\n", feed.Name, feed.Url, feed.Username)
+	}
+	return nil
+}
