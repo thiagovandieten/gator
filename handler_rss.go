@@ -5,6 +5,8 @@ import (
 	"errors"
 	"fmt"
 	"net/url"
+	"os"
+	"text/tabwriter"
 
 	"github.com/thiagovandieten/gator/internal/database"
 )
@@ -64,9 +66,12 @@ func handlerFeeds(s *state, cmd Command) error {
 		fmt.Printf("No feeds saved")
 		return nil
 	}
-	fmt.Printf("Name\tURL\tUsername\n")
+
+	w := tabwriter.NewWriter(os.Stdout, 2, 1, 4, ' ', tabwriter.TabIndent)
+	fmt.Fprintln(w, "Name\tURL\tUsername")
 	for _, feed := range feeds {
-		fmt.Printf("%s\t%s\t%s\n", feed.Name, feed.Url, feed.Username)
+		fmt.Fprintf(w, "%s\t%s\t%s\n", feed.Name, feed.Url, feed.Username)
 	}
+	w.Flush()
 	return nil
 }
