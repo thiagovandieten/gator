@@ -7,6 +7,7 @@ import (
 	"net/url"
 	"os"
 	"text/tabwriter"
+	"time"
 
 	"github.com/thiagovandieten/gator/internal/database"
 )
@@ -26,8 +27,8 @@ func handlerAddFeed(s *state, cmd Command) error {
 	}
 
 	// Check if the URL is valid
-	url, err := url.Parse(cmd.Args[1])
-	if err != nil || url.Scheme == "" || url.Host == "" {
+	validURL := isValidUrl(cmd.Args[1])
+	if !validURL {
 		return errors.New("the second argument is not a valid URL")
 	}
 
@@ -74,4 +75,48 @@ func handlerFeeds(s *state, cmd Command) error {
 	}
 	w.Flush()
 	return nil
+}
+
+func handlerFollow(s *state, cmd Command) error {
+	if len(cmd.Args) < 1 {
+		return errors.New("no url given to follow")
+	}
+
+	validURL := isValidUrl(cmd.Args[0])
+	if !validURL {
+		return errors.New("not a valid url provided")
+	}
+
+	feed, err := s.db.SearchFeedByURL(context.Background(), cmd.Args[0])
+	if err != nil {
+		return err
+	}
+
+	user, err := s.db.GetUser(context.Background(), s.cfg.Username)
+	if err != nil {
+		return err
+	}
+
+	ffParams := database.CreateFeedFollowParams{
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+		UserID:    user.ID,
+		FeedID:    feed.ID,
+	}
+	feedfollow, err := s.db.CreateFeedFollow(context.Background(), ffParams)
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("%s %s", feed.Name, user.Name)
+
+	return nil
+}
+
+func isValidUrl(paramURL string) bool {
+	url, err := url.Parse(paramURL)
+	if err != nil || url.Scheme == "" || url.Host == "" {
+		return false
+	}
+	return true
 }

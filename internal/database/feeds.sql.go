@@ -18,7 +18,7 @@ INSERT INTO feeds(name, url, user_id) VALUES(
     $2,
     $3
 )
-RETURNING name, url, user_id
+RETURNING id, name, url, user_id
 `
 
 type CreateFeedParams struct {
@@ -30,7 +30,12 @@ type CreateFeedParams struct {
 func (q *Queries) CreateFeed(ctx context.Context, arg CreateFeedParams) (Feed, error) {
 	row := q.db.QueryRowContext(ctx, createFeed, arg.Name, arg.Url, arg.UserID)
 	var i Feed
-	err := row.Scan(&i.Name, &i.Url, &i.UserID)
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Url,
+		&i.UserID,
+	)
 	return i, err
 }
 
@@ -67,4 +72,22 @@ func (q *Queries) GetFeeds(ctx context.Context) ([]GetFeedsRow, error) {
 		return nil, err
 	}
 	return items, nil
+}
+
+const searchFeedByURL = `-- name: SearchFeedByURL :one
+SELECT id, name, url, user_id FROM feeds
+WHERE url = $1
+LIMIT 1
+`
+
+func (q *Queries) SearchFeedByURL(ctx context.Context, url string) (Feed, error) {
+	row := q.db.QueryRowContext(ctx, searchFeedByURL, url)
+	var i Feed
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Url,
+		&i.UserID,
+	)
+	return i, err
 }
