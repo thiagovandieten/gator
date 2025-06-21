@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"text/tabwriter"
 
 	_ "github.com/lib/pq"
 	"github.com/thiagovandieten/gator/internal/config"
@@ -28,9 +29,11 @@ func main() {
 	}
 	dbQueries := database.New(db)
 
+	tab := tabwriter.NewWriter(os.Stdout, 2, 1, 4, ' ', tabwriter.TabIndent)
 	s := state{
 		cfg: &cfg,
 		db:  dbQueries,
+		tab: tab,
 	}
 
 	cmds := Commands{
