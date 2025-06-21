@@ -5,8 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"net/url"
-	"os"
-	"text/tabwriter"
 	"time"
 
 	"github.com/thiagovandieten/gator/internal/database"
@@ -55,6 +53,14 @@ func handlerAddFeed(s *state, cmd Command) error {
 
 	fmt.Printf("%-v\n", result)
 
+	params_feedfollow := database.CreateFeedFollowParams{
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+		UserID:    user.ID,
+		FeedID:    result.ID,
+	}
+	s.db.CreateFeedFollow(context.Background(), params_feedfollow)
+
 	return nil
 }
 
@@ -68,12 +74,12 @@ func handlerFeeds(s *state, cmd Command) error {
 		return nil
 	}
 
-	w := tabwriter.NewWriter(os.Stdout, 2, 1, 4, ' ', tabwriter.TabIndent)
-	fmt.Fprintln(w, "Name\tURL\tUsername")
+	// w := tabwriter.NewWriter(os.Stdout, 2, 1, 4, ' ', tabwriter.TabIndent)
+	fmt.Fprintln(s.tab, "Name\tURL\tUsername")
 	for _, feed := range feeds {
-		fmt.Fprintf(w, "%s\t%s\t%s\n", feed.Name, feed.Url, feed.Username)
+		fmt.Fprintf(s.tab, "%s\t%s\t%s\n", feed.Name, feed.Url, feed.Username)
 	}
-	w.Flush()
+	s.tab.Flush()
 	return nil
 }
 
@@ -107,9 +113,33 @@ func handlerFollow(s *state, cmd Command) error {
 	if err != nil {
 		return err
 	}
+	fmt.Fprintln(s.tab, "Username\tFeedname\tID\tCreatedAt\tUpdatedAt\tUserID\tFeedID")
+	fmt.Fprintf(
+		s.tab,
+		"%s\t%s\t%d\t%s\t%s\t%s\t%d\n",
+		feedfollow.Username,
+		feedfollow.Feedname,
+		feedfollow.ID,
+		feedfollow.CreatedAt,
+		feedfollow.UpdatedAt,
+		feedfollow.UserID,
+		feedfollow.FeedID,
+	)
 
-	fmt.Printf("%s %s", feed.Name, user.Name)
+	s.tab.Flush()
+	return nil
+}
 
+func handlerFollowing(s *state, cmd Command) error {
+
+	feeds, err := s.db.GetFeedFollowsForUser(context.Background(), s.cfg.Username)
+	if err != nil {
+		return err
+	}
+	fmt.Printf("%s is following these feeds:\n", s.cfg.Username)
+	for _, feed := range feeds {
+		fmt.Printf("%s\n", feed)
+	}
 	return nil
 }
 

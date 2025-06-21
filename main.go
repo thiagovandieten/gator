@@ -41,13 +41,15 @@ func main() {
 	}
 
 	err = cmds.registerAll(map[string]func(*state, Command) error{
-		"login":    handlerLogin,
-		"register": handlerRegister,
-		"reset":    handlerReset,
-		"users":    handlerGetAllUsers,
-		"agg":      handlerAgg,
-		"addfeed":  handlerAddFeed,
-		"feeds":    handlerFeeds,
+		"login":     handlerLogin,
+		"register":  handlerRegister,
+		"reset":     handlerReset,
+		"users":     handlerGetAllUsers,
+		"agg":       handlerAgg,
+		"addfeed":   handlerAddFeed,
+		"feeds":     handlerFeeds,
+		"follow":    handlerFollow,
+		"following": handlerFollowing,
 	})
 	if err != nil {
 		fatal(err)
