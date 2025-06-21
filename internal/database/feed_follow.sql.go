@@ -12,7 +12,7 @@ import (
 	"github.com/google/uuid"
 )
 
-const createFeedFollow = `-- name: CreateFeedFollow :many
+const createFeedFollow = `-- name: CreateFeedFollow :one
 
 WITH inserted_rows AS (
     INSERT INTO feed_follows(created_at, updated_at, user_id, feed_id) VALUES(
@@ -47,32 +47,48 @@ type CreateFeedFollowRow struct {
 	FeedID    int32
 }
 
-func (q *Queries) CreateFeedFollow(ctx context.Context, arg CreateFeedFollowParams) ([]CreateFeedFollowRow, error) {
-	rows, err := q.db.QueryContext(ctx, createFeedFollow,
+func (q *Queries) CreateFeedFollow(ctx context.Context, arg CreateFeedFollowParams) (CreateFeedFollowRow, error) {
+	row := q.db.QueryRowContext(ctx, createFeedFollow,
 		arg.CreatedAt,
 		arg.UpdatedAt,
 		arg.UserID,
 		arg.FeedID,
 	)
+	var i CreateFeedFollowRow
+	err := row.Scan(
+		&i.Username,
+		&i.Feedname,
+		&i.ID,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.UserID,
+		&i.FeedID,
+	)
+	return i, err
+}
+
+const getFeedFollowsForUser = `-- name: GetFeedFollowsForUser :many
+
+SELECT feeds.name 
+FROM feeds 
+INNER JOIN feed_follows 
+ON feeds.id = feed_follows.feed_id WHERE 
+feed_follows.user_id = (SELECT id FROM users WHERE users.name = $1)
+`
+
+func (q *Queries) GetFeedFollowsForUser(ctx context.Context, name string) ([]string, error) {
+	rows, err := q.db.QueryContext(ctx, getFeedFollowsForUser, name)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []CreateFeedFollowRow
+	var items []string
 	for rows.Next() {
-		var i CreateFeedFollowRow
-		if err := rows.Scan(
-			&i.Username,
-			&i.Feedname,
-			&i.ID,
-			&i.CreatedAt,
-			&i.UpdatedAt,
-			&i.UserID,
-			&i.FeedID,
-		); err != nil {
+		var name string
+		if err := rows.Scan(&name); err != nil {
 			return nil, err
 		}
-		items = append(items, i)
+		items = append(items, name)
 	}
 	if err := rows.Close(); err != nil {
 		return nil, err
