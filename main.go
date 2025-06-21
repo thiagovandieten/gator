@@ -46,7 +46,7 @@ func main() {
 		"reset":     handlerReset,
 		"users":     handlerGetAllUsers,
 		"agg":       handlerAgg,
-		"addfeed":   handlerAddFeed,
+		"addfeed":   middlewareLoggedin(handlerAddFeed),
 		"feeds":     handlerFeeds,
 		"follow":    handlerFollow,
 		"following": handlerFollowing,

@@ -19,7 +19,7 @@ func handlerAgg(s *state, cmd Command) error {
 	return nil
 }
 
-func handlerAddFeed(s *state, cmd Command) error {
+func handlerAddFeed(s *state, cmd Command, user database.User) error {
 	if len(cmd.Args) < 2 {
 		return errors.New("not enough arguments provided to add feed")
 	}
@@ -29,16 +29,6 @@ func handlerAddFeed(s *state, cmd Command) error {
 	if !validURL {
 		return errors.New("the second argument is not a valid URL")
 	}
-
-	user, err := s.db.GetUser(context.Background(), s.cfg.Username)
-	if err != nil {
-		return err
-	}
-
-	// feed, err := fetchFeed(cmd.Args[1])
-	// if err != nil {
-	// 	return err
-	// }
 
 	params := database.CreateFeedParams{
 		Name:   cmd.Args[0],
