@@ -73,7 +73,7 @@ func handlerFeeds(s *state, cmd Command) error {
 	return nil
 }
 
-func handlerFollow(s *state, cmd Command) error {
+func handlerFollow(s *state, cmd Command, user database.User) error {
 	if len(cmd.Args) < 1 {
 		return errors.New("no url given to follow")
 	}
@@ -84,11 +84,6 @@ func handlerFollow(s *state, cmd Command) error {
 	}
 
 	feed, err := s.db.SearchFeedByURL(context.Background(), cmd.Args[0])
-	if err != nil {
-		return err
-	}
-
-	user, err := s.db.GetUser(context.Background(), s.cfg.Username)
 	if err != nil {
 		return err
 	}
@@ -130,6 +125,23 @@ func handlerFollowing(s *state, cmd Command) error {
 	for _, feed := range feeds {
 		fmt.Printf("%s\n", feed)
 	}
+	return nil
+}
+
+func handlerUnfollowing(s *state, cmd Command, user database.User) error {
+	if len(cmd.Args) < 1 {
+		return errors.New("no feed url provided")
+	}
+
+	if !isValidUrl(cmd.Args[0]) {
+		return errors.New("not a valid url provided")
+	}
+
+	params := database.DeleteFeedFollowWithFeedURLParams{
+		Url:    cmd.Args[0],
+		UserID: user.ID,
+	}
+	s.db.DeleteFeedFollowWithFeedURL(context.Background(), params)
 	return nil
 }
 

@@ -48,8 +48,9 @@ func main() {
 		"agg":       handlerAgg,
 		"addfeed":   middlewareLoggedin(handlerAddFeed),
 		"feeds":     handlerFeeds,
-		"follow":    handlerFollow,
+		"follow":    middlewareLoggedin(handlerFollow),
 		"following": handlerFollowing,
+		"unfollow":  middlewareLoggedin(handlerUnfollowing),
 	})
 	if err != nil {
 		fatal(err)
