@@ -7,34 +7,49 @@ package database
 
 import (
 	"context"
+	"database/sql"
+	"time"
 
 	"github.com/google/uuid"
 )
 
 const createFeed = `-- name: CreateFeed :one
 
-INSERT INTO feeds(name, url, user_id) VALUES(
+INSERT INTO feeds(name, created_at, updated_at, url, user_id) VALUES(
     $1,
     $2,
-    $3
+    $3,
+    $4,
+    $5
 )
-RETURNING id, name, url, user_id
+RETURNING id, created_at, updated_at, name, url, user_id, last_fetched_at
 `
 
 type CreateFeedParams struct {
-	Name   string
-	Url    string
-	UserID uuid.UUID
+	Name      string
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	Url       string
+	UserID    uuid.UUID
 }
 
 func (q *Queries) CreateFeed(ctx context.Context, arg CreateFeedParams) (Feed, error) {
-	row := q.db.QueryRowContext(ctx, createFeed, arg.Name, arg.Url, arg.UserID)
+	row := q.db.QueryRowContext(ctx, createFeed,
+		arg.Name,
+		arg.CreatedAt,
+		arg.UpdatedAt,
+		arg.Url,
+		arg.UserID,
+	)
 	var i Feed
 	err := row.Scan(
 		&i.ID,
+		&i.CreatedAt,
+		&i.UpdatedAt,
 		&i.Name,
 		&i.Url,
 		&i.UserID,
+		&i.LastFetchedAt,
 	)
 	return i, err
 }
@@ -74,8 +89,24 @@ func (q *Queries) GetFeeds(ctx context.Context) ([]GetFeedsRow, error) {
 	return items, nil
 }
 
+const markFeedFatchedById = `-- name: MarkFeedFatchedById :exec
+UPDATE feeds 
+SET last_fetched_at = $1
+WHERE id = $2
+`
+
+type MarkFeedFatchedByIdParams struct {
+	LastFetchedAt sql.NullTime
+	ID            int32
+}
+
+func (q *Queries) MarkFeedFatchedById(ctx context.Context, arg MarkFeedFatchedByIdParams) error {
+	_, err := q.db.ExecContext(ctx, markFeedFatchedById, arg.LastFetchedAt, arg.ID)
+	return err
+}
+
 const searchFeedByURL = `-- name: SearchFeedByURL :one
-SELECT id, name, url, user_id FROM feeds
+SELECT id, created_at, updated_at, name, url, user_id, last_fetched_at FROM feeds
 WHERE url = $1
 LIMIT 1
 `
@@ -85,9 +116,12 @@ func (q *Queries) SearchFeedByURL(ctx context.Context, url string) (Feed, error)
 	var i Feed
 	err := row.Scan(
 		&i.ID,
+		&i.CreatedAt,
+		&i.UpdatedAt,
 		&i.Name,
 		&i.Url,
 		&i.UserID,
+		&i.LastFetchedAt,
 	)
 	return i, err
 }

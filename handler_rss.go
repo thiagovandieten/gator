@@ -31,9 +31,11 @@ func handlerAddFeed(s *state, cmd Command, user database.User) error {
 	}
 
 	params := database.CreateFeedParams{
-		Name:   cmd.Args[0],
-		Url:    cmd.Args[1],
-		UserID: user.ID,
+		Name:      cmd.Args[0],
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+		Url:       cmd.Args[1],
+		UserID:    user.ID,
 	}
 
 	result, err := s.db.CreateFeed(context.Background(), params)
