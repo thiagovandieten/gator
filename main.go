@@ -18,6 +18,7 @@ func fatal(e error) {
 }
 
 func main() {
+	// scam commit because I can't work on this project today
 	cfg, err := config.GetConfig()
 	if err != nil {
 		fatal(err)
