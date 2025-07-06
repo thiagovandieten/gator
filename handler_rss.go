@@ -147,6 +147,10 @@ func handlerUnfollowing(s *state, cmd Command, user database.User) error {
 	return nil
 }
 
+func scrapeFeeds() error {
+	return nil
+}
+
 func isValidUrl(paramURL string) bool {
 	url, err := url.Parse(paramURL)
 	if err != nil || url.Scheme == "" || url.Host == "" {
