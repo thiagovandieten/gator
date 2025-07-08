@@ -92,11 +92,13 @@ func (q *Queries) GetFeeds(ctx context.Context) ([]GetFeedsRow, error) {
 const getNextFeedToFetch = `-- name: GetNextFeedToFetch :many
 SELECT id, created_at, updated_at, name, url, user_id, last_fetched_at
 FROM feeds
-ORDER BY last_fetched_at ASC NULLS FIRST
+WHERE id = $1
+ORDER BY last_fetched_at 
+ASC NULLS FIRST
 `
 
-func (q *Queries) GetNextFeedToFetch(ctx context.Context) ([]Feed, error) {
-	rows, err := q.db.QueryContext(ctx, getNextFeedToFetch)
+func (q *Queries) GetNextFeedToFetch(ctx context.Context, id int32) ([]Feed, error) {
+	rows, err := q.db.QueryContext(ctx, getNextFeedToFetch, id)
 	if err != nil {
 		return nil, err
 	}

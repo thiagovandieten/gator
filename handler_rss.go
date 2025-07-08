@@ -148,7 +148,7 @@ func handlerUnfollowing(s *state, cmd Command, user database.User) error {
 }
 
 func scrapeFeeds(s *state, cmd Command, user database.User) error {
-	feeds, err := s.db.GetFeedFollowsForUser(ctx.Background(), user.Name)
+	feeds, err := s.db.GetFeedFollowsForUser(context.Background(), user.Name)
 	if err != nil {
 		return err
 	}

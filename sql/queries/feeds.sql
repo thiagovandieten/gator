@@ -27,4 +27,6 @@ WHERE id = $2;
 -- name: GetNextFeedToFetch :many
 SELECT *
 FROM feeds
-ORDER BY last_fetched_at ASC NULLS FIRST;
+WHERE id = $1
+ORDER BY last_fetched_at 
+ASC NULLS FIRST;
