@@ -147,14 +147,7 @@ func handlerUnfollowing(s *state, cmd Command, user database.User) error {
 	return nil
 }
 
-func scrapeFeeds(s *state, cmd Command, user database.User) error {
-	feeds, err := s.db.GetFeedFollowsForUser(context.Background(), user.Name)
-	if err != nil {
-		return err
-	}
-	if len(feeds) < 1 {
-		return errors.New("no feeds found for this user")
-	}
+func scrapeFeeds() error {
 	return nil
 }
 
