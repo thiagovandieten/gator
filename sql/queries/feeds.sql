@@ -19,7 +19,7 @@ SELECT * FROM feeds
 WHERE url = $1
 LIMIT 1;
 
--- name: MarkFeedFatchedById :exec
+-- name: MarkFeedFetchedById :exec
 UPDATE feeds 
 SET last_fetched_at = $1
 WHERE id = $2; 
@@ -27,6 +27,5 @@ WHERE id = $2;
 -- name: GetNextFeedToFetch :many
 SELECT *
 FROM feeds
-WHERE id = $1
 ORDER BY last_fetched_at 
 ASC NULLS FIRST;
