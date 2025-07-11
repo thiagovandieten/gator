@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 	"fmt"
 	"net/url"
@@ -147,7 +148,21 @@ func handlerUnfollowing(s *state, cmd Command, user database.User) error {
 	return nil
 }
 
-func scrapeFeeds() error {
+func scrapeFeeds(s *state) error {
+	feeds, err := s.db.GetNextFeedToFetch(context.Background())
+	if err != nil {
+		return err
+	}
+	for _, v := range feeds {
+		params := database.MarkFeedFetchedByIdParams{
+			ID: v.ID,
+			LastFetchedAt: sql.NullTime{
+				Time:  time.Now(),
+				Valid: true,
+			},
+		}
+		s.db.MarkFeedFetchedById(context.Background(), params)
+	}
 	return nil
 }
 
