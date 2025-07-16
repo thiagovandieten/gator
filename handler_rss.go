@@ -162,6 +162,11 @@ func scrapeFeeds(s *state) error {
 			},
 		}
 		s.db.MarkFeedFetchedById(context.Background(), params)
+		feed, err := fetchFeed(v.Url)
+
+		if err != nil {
+			return err
+		}
 	}
 	return nil
 }
