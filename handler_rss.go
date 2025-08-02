@@ -12,12 +12,26 @@ import (
 )
 
 func handlerAgg(s *state, cmd Command) error {
-	feed, err := fetchFeed("https://www.wagslane.dev/index.xml")
-	if err != nil {
-		return err
+	if len(cmd.Args) < 1 {
+		return errors.New("usage: agg <time_between_reqs>")
 	}
-	fmt.Printf("%-v\n", feed)
-	return nil
+
+	timeBetweenRequests, err := time.ParseDuration(cmd.Args[0])
+	if err != nil {
+		return fmt.Errorf("invalid duration: %w", err)
+	}
+
+	fmt.Printf("Collecting feeds every %v\n", timeBetweenRequests)
+
+	ticker := time.NewTicker(timeBetweenRequests)
+	defer ticker.Stop()
+
+	for ; ; <-ticker.C {
+		err := scrapeFeeds(s)
+		if err != nil {
+			fmt.Printf("Error scraping feeds: %v\n", err)
+		}
+	}
 }
 
 func handlerAddFeed(s *state, cmd Command, user database.User) error {
@@ -153,21 +167,40 @@ func scrapeFeeds(s *state) error {
 	if err != nil {
 		return err
 	}
-	for _, v := range feeds {
-		params := database.MarkFeedFetchedByIdParams{
-			ID: v.ID,
-			LastFetchedAt: sql.NullTime{
-				Time:  time.Now(),
-				Valid: true,
-			},
-		}
-		s.db.MarkFeedFetchedById(context.Background(), params)
-		feed, err := fetchFeed(v.Url)
 
-		if err != nil {
-			return err
-		}
+	if len(feeds) == 0 {
+		fmt.Println("No feeds to fetch")
+		return nil
 	}
+
+	// Get the first feed (oldest or never fetched)
+	feed := feeds[0]
+
+	// Mark it as fetched
+	params := database.MarkFeedFetchedByIdParams{
+		ID: feed.ID,
+		LastFetchedAt: sql.NullTime{
+			Time:  time.Now(),
+			Valid: true,
+		},
+	}
+	err = s.db.MarkFeedFetchedById(context.Background(), params)
+	if err != nil {
+		return err
+	}
+
+	// Fetch the feed using the URL
+	rssFeed, err := fetchFeed(feed.Url)
+	if err != nil {
+		return err
+	}
+
+	// Iterate over the items in the feed and print their titles
+	fmt.Printf("Found %d posts from %s\n", len(rssFeed.Channel.Item), feed.Name)
+	for _, item := range rssFeed.Channel.Item {
+		fmt.Printf("- %s\n", item.Title)
+	}
+
 	return nil
 }
 
