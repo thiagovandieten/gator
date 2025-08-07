@@ -198,10 +198,49 @@ func scrapeFeeds(s *state) error {
 	// Iterate over the items in the feed and print their titles
 	fmt.Printf("Found %d posts from %s\n", len(rssFeed.Channel.Item), feed.Name)
 	for _, item := range rssFeed.Channel.Item {
+		// Show the title of each item to the user
 		fmt.Printf("- %s\n", item.Title)
+
+		// See if the publushed date is valid by either RFC2822 or RFC3339 standards
+		publishedTime := parseTime(item.PubDate, item.Title)
+
+		// Save the item to the database
+		params := database.CreatePostParams{
+			CreatedAt:   time.Now(),
+			UpdatedAt:   time.Now(),
+			Title:       item.Title,
+			Url:         item.Link,
+			Description: sql.NullString{String: item.Description, Valid: item.Description != ""},
+			PublishedAt: publishedTime,
+			FeedID:      feed.ID,
+		}
+		err = s.db.CreatePost(context.Background(), params)
+		if err != nil {
+			// ignore error if the Url already exists
+			if err.Error() == "pq: duplicate key value violates unique constraint \"posts_url_key\"" {
+				continue
+			}
+			//otherwise return the error
+			return err
+		}
+
 	}
 
 	return nil
+}
+
+func parseTime(pubDate string, title string) time.Time {
+	publishedTime, err := time.Parse(time.RFC3339, pubDate)
+	if err != nil {
+		// If not, try RFC2822
+		publishedTime, err = time.Parse(time.RFC1123Z, pubDate)
+		if err != nil {
+			fmt.Printf("Error parsing published date for item %s: %v\n", title, err)
+			// Make pubdate the current time if parsing fails
+			publishedTime = time.Now()
+		}
+	}
+	return publishedTime
 }
 
 func isValidUrl(paramURL string) bool {
