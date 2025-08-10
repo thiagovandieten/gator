@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"net/url"
+	"strconv"
 	"time"
 
 	"github.com/thiagovandieten/gator/internal/database"
@@ -68,6 +69,35 @@ func handlerAddFeed(s *state, cmd Command, user database.User) error {
 	}
 	s.db.CreateFeedFollow(context.Background(), params_feedfollow)
 
+	return nil
+}
+
+func handlerBrowse(s *state, cmd Command, user database.User) error {
+	var limit int32
+	var err error
+	if len(cmd.Args) >= 1 {
+		var i int
+		i, err = strconv.Atoi(cmd.Args[0])
+		if err != nil {
+			return fmt.Errorf("invalid limit: %w", err)
+		}
+		limit = int32(i)
+	} else {
+		limit = 2
+	}
+
+	// Implement the logic of using database.GetPostsByUser
+	posts, err := s.db.GetPostsByUser(context.Background(), database.GetPostsByUserParams{
+		UserID: user.ID,
+		Limit:  limit,
+	})
+	if err != nil {
+		return err
+	}
+
+	for _, post := range posts {
+		fmt.Printf("Post: %s\n", post.Title)
+	}
 	return nil
 }
 

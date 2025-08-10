@@ -51,6 +51,7 @@ func main() {
 		"follow":    middlewareLoggedin(handlerFollow),
 		"following": handlerFollowing,
 		"unfollow":  middlewareLoggedin(handlerUnfollowing),
+		"browse":    middlewareLoggedin(handlerBrowse),
 	})
 	if err != nil {
 		fatal(err)
