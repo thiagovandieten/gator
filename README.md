@@ -4,7 +4,13 @@ This is a project I had to make during my Boot.Dev courses. It's a terminal base
 # Dependices
 - Postgresql
 - [Goose](https://pressly.github.io/goose/))
+    - Install with go install: `go install github.com/pressly/goose/v3/cmd/goose@latest`
 - [sqlc](https://sqlc.dev)
+    - Install with go install: `go install github.com/sqlc-dev/sqlc/cmd/sqlc@latest`
+- Google's UUID library
+    - Install with go get: `go get github.com/google/uuid`
+- Go Postgresdriver:
+    - Install with go get: `go get github.com/lib/pq`
 
 # Instructions
 I assume when you develop on this project that the dependecies are installed, with a database called gator 
